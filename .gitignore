@@ -1,0 +1,8 @@
+target
+classes
+
+*.iml
+*.DS_Store
+
+.idea/*
+!.idea/runConfigurations
