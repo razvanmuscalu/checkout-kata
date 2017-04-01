@@ -23,7 +23,8 @@ public class Checkout {
 
         return itemsByCount.entrySet()
                 .stream()
-                .mapToLong(entry -> rule1.apply(entry.getKey(), entry.getValue()))
+                .map(entry -> rule1.apply(entry.getKey(), new Unit(0L, entry.getValue())))
+                .mapToLong(Unit::getPrice)
                 .sum();
 
     }

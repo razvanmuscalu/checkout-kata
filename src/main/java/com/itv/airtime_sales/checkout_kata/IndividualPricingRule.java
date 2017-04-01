@@ -7,7 +7,6 @@ public final class IndividualPricingRule implements PricingRuleChain {
     private PricingRuleChain pricingRule;
 
     public IndividualPricingRule(final String item, final long price) {
-        super();
         this.item = item;
         this.price = price;
     }
@@ -18,10 +17,10 @@ public final class IndividualPricingRule implements PricingRuleChain {
     }
 
     @Override
-    public Long apply(String item, Long amount) {
+    public Unit apply(String item, Unit unit) {
         if (item.equals(this.item))
-            return amount * price;
+            return new Unit(unit.getPrice() + (unit.getRemainder() * price), unit.getRemainder() - 1);
 
-        return 0L;
+        return unit;
     }
 }

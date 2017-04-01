@@ -5,5 +5,5 @@ public interface PricingRuleChain {
 
     void nextRule(PricingRuleChain nextRule);
 
-    Long apply(String item, Long amount);
+    Unit apply(String item, Unit unit);
 }
