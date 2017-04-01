@@ -8,6 +8,7 @@ import org.mockito.Mock;
 
 import java.util.List;
 
+import static com.itv.airtime_sales.checkout_kata.PricingRuleChainBuilder.newChain;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -25,21 +26,28 @@ public class CheckoutTest {
 
     @Parameterized.Parameters(name = "{1} items cost {2}")
     public static Iterable<Object[]> data() {
-        MultiItemPricingRule multiAIndividualA = new MultiItemPricingRule("A", 130L, 3);
-        multiAIndividualA.nextRule(new IndividualPricingRule("A", 50L));
 
-        IndividualPricingRule individualAindividualB = new IndividualPricingRule("A", 50L);
-        individualAindividualB.nextRule(new IndividualPricingRule("B", 30L));
+        PricingRuleChain multiAIndividualA = newChain()
+                .first(new MultiItemPricingRule("A", 130L, 3))
+                .next(new IndividualPricingRule("A", 50L))
+                .build();
 
-        MultiItemPricingRule multiAmultiB = new MultiItemPricingRule("A", 130L, 3);
-        multiAmultiB.nextRule(new MultiItemPricingRule("B", 45L, 2));
+        PricingRuleChain individualAindividualB = newChain()
+                .first(new IndividualPricingRule("A", 50L))
+                .next(new IndividualPricingRule("B", 30L))
+                .build();
 
-        MultiItemPricingRule multiAmultiBIndividualAindividualB = new MultiItemPricingRule("A", 130L, 3);
-        MultiItemPricingRule multiRuleForB = new MultiItemPricingRule("B", 45L, 2);
-        IndividualPricingRule individualRuleForA = new IndividualPricingRule("A", 50L);
-        multiAmultiBIndividualAindividualB.nextRule(multiRuleForB);
-        multiRuleForB.nextRule(individualRuleForA);
-        individualRuleForA.nextRule(new IndividualPricingRule("B", 30L));
+        PricingRuleChain multiAmultiB = newChain()
+                .first(new MultiItemPricingRule("A", 130L, 3))
+                .next(new MultiItemPricingRule("B", 45L, 2))
+                .build();
+
+        PricingRuleChain multiAmultiBIndividualAindividualB = newChain()
+                .first(new MultiItemPricingRule("A", 130L, 3))
+                .next(new MultiItemPricingRule("B", 45L, 2))
+                .next(new IndividualPricingRule("A", 50L))
+                .next(new IndividualPricingRule("B", 30L))
+                .build();
 
         return asList(new Object[][]{
                 {multiAIndividualA, singletonList(null), 0L},
