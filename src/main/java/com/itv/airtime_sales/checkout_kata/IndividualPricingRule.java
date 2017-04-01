@@ -18,9 +18,18 @@ public final class IndividualPricingRule implements PricingRuleChain {
 
     @Override
     public Unit apply(String item, Unit unit) {
-        if (item.equals(this.item))
-            return new Unit(unit.getPrice() + (unit.getRemainder() * price), unit.getRemainder() - 1);
+        Unit result = applyRuleAndGetUpdatedUnit(unit);
 
-        return unit;
+        if (item.equals(this.item))
+            return result;
+
+        return pricingRule.apply(item, unit);
+    }
+
+    private Unit applyRuleAndGetUpdatedUnit(Unit unit) {
+        long itemPrice = unit.getPrice() + (unit.getRemainder() * price);
+        int remainder = 0;
+
+        return new Unit(itemPrice, remainder);
     }
 }

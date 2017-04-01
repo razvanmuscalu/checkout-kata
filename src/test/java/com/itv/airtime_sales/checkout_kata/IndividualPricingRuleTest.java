@@ -17,28 +17,26 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @RunWith(Enclosed.class)
-public class MultiItemPricingRuleTest {
+public class IndividualPricingRuleTest {
 
     @RunWith(Parameterized.class)
     public static class ParameterizedTest {
 
-        private MultiItemPricingRule sut = new MultiItemPricingRule("A", 130L, 3);
+        public IndividualPricingRule sut = new IndividualPricingRule("A", 50L);
 
         @Parameterized.Parameters(name = "ITEM {0} | BEFORE: {1} price, {2} remainder | AFTER: {3} price, {4} remainder")
         public static Iterable<Object[]> data() {
             return asList(new Object[][]{
-                    {"A", 0L, 2, 0L, 2},
-                    {"A", 0L, 3, 130L, 0},
-                    {"A", 0L, 4, 130L, 1},
-                    {"A", 0L, 6, 260L, 0},
-//                    {"B", 0L, 2, 0L, 2},
-//                    {"B", 0L, 3, 0L, 3},
-                    {"A", 25L, 2, 25L, 2},
-                    {"A", 25L, 3, 155L, 0},
-                    {"A", 25L, 4, 155L, 1},
-                    {"A", 25L, 6, 285L, 0},
-//                    {"B", 25L, 2, 25L, 2},
-//                    {"B", 25L, 3, 25L, 3},
+                    {"A", 0L, 1, 50L, 0},
+                    {"A", 0L, 2, 100L, 0},
+                    {"A", 0L, 3, 150L, 0},
+//                {"B", 0L, 2, 0L, 2},
+//                {"B", 0L, 3, 0L, 3},
+                    {"A", 25L, 1, 75L, 0},
+                    {"A", 25L, 2, 125L, 0},
+                    {"A", 25L, 3, 175L, 0},
+//                {"B", 25L, 2, 25L, 2},
+//                {"B", 25L, 3, 25L, 3},
             });
         }
 
@@ -62,7 +60,6 @@ public class MultiItemPricingRuleTest {
 
         @Test
         public void shouldApplyRuleCorrectly() {
-
             Unit result = sut.apply(item, new Unit(beforePrice, beforeRemainder));
 
             assertThat("should produce correct price", result.getPrice(), is(afterPrice));
@@ -73,7 +70,7 @@ public class MultiItemPricingRuleTest {
     @RunWith(MockitoJUnitRunner.class)
     public static class NonParameterizedTest {
 
-        private MultiItemPricingRule sut = new MultiItemPricingRule("A", 130L, 3);
+        private IndividualPricingRule sut = new IndividualPricingRule("A", 50L);
 
         @Mock
         private PricingRuleChain nextPricingRule;
@@ -84,17 +81,10 @@ public class MultiItemPricingRuleTest {
         }
 
         @Test
-        public void shouldNotCallNextRuleWhenRemainderIsZero() {
-            sut.apply("A", new Unit(0L, 3));
+        public void shouldNotCallNextRule() {
+            sut.apply("A", new Unit(0L, 1));
 
             verify(nextPricingRule, times(0)).apply(anyString(), any(Unit.class));
-        }
-
-        @Test
-        public void shouldCallNextRuleWhenRemainderBiggerThanZero() {
-            sut.apply("A", new Unit(0L, 4));
-
-            verify(nextPricingRule, times(1)).apply(anyString(), any(Unit.class));
         }
 
         @Test

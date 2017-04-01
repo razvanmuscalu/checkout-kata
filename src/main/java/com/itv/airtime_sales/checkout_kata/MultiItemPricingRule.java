@@ -5,7 +5,7 @@ public final class MultiItemPricingRule implements PricingRuleChain {
     private final String item;
     private final long price;
     private final int special;
-    private PricingRuleChain pricingRule;
+    private PricingRuleChain nextPricingRule;
 
     public MultiItemPricingRule(final String item, final long price, final int special) {
         this.item = item;
@@ -15,7 +15,7 @@ public final class MultiItemPricingRule implements PricingRuleChain {
 
     @Override
     public void nextRule(PricingRuleChain nextRule) {
-        this.pricingRule = nextRule;
+        this.nextPricingRule = nextRule;
     }
 
     @Override
@@ -23,16 +23,16 @@ public final class MultiItemPricingRule implements PricingRuleChain {
         Unit result = applyRuleAndGetUpdatedUnit(unit);
 
         if (item.equals(this.item))
-            if (pricingRule != null)
-                return pricingRule.apply(item, result);
+            if (result.getRemainder() > 0 && nextPricingRule != null)
+                return nextPricingRule.apply(item, result);
             else
                 return result;
 
-        return unit;
+        return nextPricingRule.apply(item, unit);
     }
 
     private Unit applyRuleAndGetUpdatedUnit(Unit unit) {
-        long multiItemPrice = this.price * (unit.getRemainder() / special);
+        long multiItemPrice = unit.getPrice() + this.price * (unit.getRemainder() / special);
         int remainder = unit.getRemainder() - (unit.getRemainder() / special) * special;
 
         return new Unit(multiItemPrice, remainder);
