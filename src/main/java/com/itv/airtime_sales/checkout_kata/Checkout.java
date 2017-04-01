@@ -10,11 +10,14 @@ import static java.util.stream.Collectors.groupingBy;
 
 public class Checkout {
 
-    public Long getPrice(List<String> items) {
+    private final RuleProvider ruleProvider;
 
-        MultiItemPricingRule rule1 = new MultiItemPricingRule("A", 130L, 3);
-        IndividualPricingRule rule2 = new IndividualPricingRule("A", 50L);
-        rule1.nextRule(rule2);
+    public Checkout(RuleProvider ruleProvider) {
+        this.ruleProvider = ruleProvider;
+    }
+
+    public Long getPrice(List<String> items) {
+        PricingRuleChain ruleChain = ruleProvider.getRuleChain();
 
         Map<String, Long> itemsByCount = items
                 .stream()
@@ -23,7 +26,7 @@ public class Checkout {
 
         return itemsByCount.entrySet()
                 .stream()
-                .map(entry -> rule1.apply(entry.getKey(), new Unit(0L, entry.getValue())))
+                .map(entry -> ruleChain.apply(entry.getKey(), new Unit(0L, entry.getValue())))
                 .mapToLong(Unit::getPrice)
                 .sum();
 
