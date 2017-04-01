@@ -4,9 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.summingInt;
 
 public class Checkout {
 
@@ -19,10 +18,10 @@ public class Checkout {
     public Long getPrice(List<String> items) {
         PricingRuleChain ruleChain = ruleProvider.getRuleChain();
 
-        Map<String, Long> itemsByCount = items
+        Map<String, Integer> itemsByCount = items
                 .stream()
                 .filter(Objects::nonNull)
-                .collect(groupingBy(identity(), counting()));
+                .collect(groupingBy(x -> x, summingInt(x -> 1)));
 
         return itemsByCount.entrySet()
                 .stream()

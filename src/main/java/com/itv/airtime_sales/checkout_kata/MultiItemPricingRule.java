@@ -20,22 +20,20 @@ public final class MultiItemPricingRule implements PricingRuleChain {
 
     @Override
     public Unit apply(String item, Unit unit) {
+        Unit result = applyRuleAndGetUpdatedUnit(unit);
+
         if (item.equals(this.item))
-            if (hasEnoughAmountForOffer(unit))
-                return pricingRule.apply(item, applyRuleAndGetUpdatedUnit(unit));
+            if (pricingRule != null)
+                return pricingRule.apply(item, result);
             else
-                return pricingRule.apply(item, unit);
+                return result;
 
         return unit;
     }
 
-    private boolean hasEnoughAmountForOffer(Unit unit) {
-        return unit.getRemainder() / special > 0;
-    }
-
     private Unit applyRuleAndGetUpdatedUnit(Unit unit) {
         long multiItemPrice = this.price * (unit.getRemainder() / special);
-        long remainder = unit.getRemainder() - special;
+        int remainder = unit.getRemainder() - (unit.getRemainder() / special) * special;
 
         return new Unit(multiItemPrice, remainder);
     }

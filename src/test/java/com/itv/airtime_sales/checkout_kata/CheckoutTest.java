@@ -23,23 +23,28 @@ public class CheckoutTest {
 
     private Checkout sut;
 
-    @Parameterized.Parameters(name = "{0} items cost {1}")
+    @Parameterized.Parameters(name = "{1} items cost {2}")
     public static Iterable<Object[]> data() {
-        return asList(new Object[][]{
-                {singletonList(null), 0L},
-                {singletonList(""), 0L},
-                {singletonList("A"), 50L},
-                {asList("A", "A"), 100L},
-                {asList("A", "A", "A"), 130L},
-                {asList("A", "A", "A", "A"), 180L},
+        MultiItemPricingRule chainedRuleForA = new MultiItemPricingRule("A", 130L, 3);
+        IndividualPricingRule individualRuleForA = new IndividualPricingRule("A", 50L);
+        chainedRuleForA.nextRule(individualRuleForA);
 
+        return asList(new Object[][]{
+                {chainedRuleForA, singletonList(null), 0L},
+                {chainedRuleForA, singletonList(""), 0L},
+                {chainedRuleForA, singletonList("A"), 50L},
+                {chainedRuleForA, asList("A", "A"), 100L},
+                {chainedRuleForA, asList("A", "A", "A"), 130L},
+                {chainedRuleForA, asList("A", "A", "A", "A"), 180L}
         });
     }
 
+    private final PricingRuleChain pricingRuleChain;
     private final List<String> items;
     private final Long price;
 
-    public CheckoutTest(List<String> items, Long price) {
+    public CheckoutTest(PricingRuleChain pricingRuleChain, List<String> items, Long price) {
+        this.pricingRuleChain = pricingRuleChain;
         this.items = items;
         this.price = price;
     }
@@ -51,13 +56,9 @@ public class CheckoutTest {
     }
 
     @Test
-    public void shouldCheckoutCorrectlyWithTwoRules() {
-        MultiItemPricingRule rule1 = new MultiItemPricingRule("A", 130L, 3);
-        IndividualPricingRule rule2 = new IndividualPricingRule("A", 50L);
-        rule1.nextRule(rule2);
+    public void shouldCheckoutCorrectly() {
+        when(ruleProvider.getRuleChain()).thenReturn(pricingRuleChain);
 
-        when(ruleProvider.getRuleChain()).thenReturn(rule1);
-
-        assertThat("should return correct price using two rules", sut.getPrice(items), is(price));
+        assertThat("should return correct price using given rules", sut.getPrice(items), is(price));
     }
 }
