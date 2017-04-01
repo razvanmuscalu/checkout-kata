@@ -23,6 +23,7 @@ public class CheckoutTest {
                 {singletonList(""), 0L},
                 {singletonList("A"), 50L},
                 {asList("A", "A"), 100L},
+                {asList("A", "A", "A"), 130L},
 
         });
     }

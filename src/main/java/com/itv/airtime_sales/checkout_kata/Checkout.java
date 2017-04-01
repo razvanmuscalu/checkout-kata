@@ -1,6 +1,5 @@
 package com.itv.airtime_sales.checkout_kata;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -11,14 +10,11 @@ import static java.util.stream.Collectors.groupingBy;
 
 public class Checkout {
 
-    private static Map<String, Long> prices;
-
-    static {
-        prices = new HashMap<>();
-        prices.put("A", 50L);
-    }
-
     public Long getPrice(List<String> items) {
+
+        MultiItemPricingRule rule1 = new MultiItemPricingRule("A", 130L, 3);
+        IndividualPricingRule rule2 = new IndividualPricingRule("A", 50L);
+        rule1.nextRule(rule2);
 
         Map<String, Long> itemsByCount = items
                 .stream()
@@ -27,13 +23,7 @@ public class Checkout {
 
         return itemsByCount.entrySet()
                 .stream()
-                .map(entry -> {
-                    String item = entry.getKey();
-                    Long amount = entry.getValue();
-
-                    return amount * prices.getOrDefault(item, 0L);
-                })
-                .mapToLong(Long::longValue)
+                .mapToLong(entry -> rule1.apply(entry.getKey(), entry.getValue()))
                 .sum();
 
     }
