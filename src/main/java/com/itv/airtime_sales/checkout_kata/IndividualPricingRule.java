@@ -23,7 +23,10 @@ public final class IndividualPricingRule implements PricingRuleChain {
         if (item.equals(this.item))
             return result;
 
-        return nextPricingRule.apply(item, unit);
+        if (nextPricingRule != null)
+            return nextPricingRule.apply(item, unit);
+
+        return unit;
     }
 
     private Unit applyRuleAndGetUpdatedUnit(Unit unit) {

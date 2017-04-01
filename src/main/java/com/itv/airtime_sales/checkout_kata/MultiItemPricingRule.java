@@ -28,7 +28,10 @@ public final class MultiItemPricingRule implements PricingRuleChain {
             else
                 return result;
 
-        return nextPricingRule.apply(item, unit);
+        if (nextPricingRule != null)
+            return nextPricingRule.apply(item, unit);
+
+        return unit;
     }
 
     private Unit applyRuleAndGetUpdatedUnit(Unit unit) {

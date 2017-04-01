@@ -26,31 +26,45 @@ public class CheckoutTest {
     @Parameterized.Parameters(name = "{1} items cost {2}")
     public static Iterable<Object[]> data() {
         MultiItemPricingRule multiAIndividualA = new MultiItemPricingRule("A", 130L, 3);
-        IndividualPricingRule individualRuleForA = new IndividualPricingRule("A", 50L);
-        multiAIndividualA.nextRule(individualRuleForA);
+        multiAIndividualA.nextRule(new IndividualPricingRule("A", 50L));
 
         IndividualPricingRule individualAindividualB = new IndividualPricingRule("A", 50L);
-        IndividualPricingRule individualRuleForB = new IndividualPricingRule("B", 30L);
-        individualAindividualB.nextRule(individualRuleForB);
+        individualAindividualB.nextRule(new IndividualPricingRule("B", 30L));
+
+        MultiItemPricingRule multiAmultiB = new MultiItemPricingRule("A", 130L, 3);
+        multiAmultiB.nextRule(new MultiItemPricingRule("B", 45L, 2));
 
         MultiItemPricingRule multiAmultiBIndividualAindividualB = new MultiItemPricingRule("A", 130L, 3);
         MultiItemPricingRule multiRuleForB = new MultiItemPricingRule("B", 45L, 2);
+        IndividualPricingRule individualRuleForA = new IndividualPricingRule("A", 50L);
         multiAmultiBIndividualAindividualB.nextRule(multiRuleForB);
         multiRuleForB.nextRule(individualRuleForA);
-        individualRuleForA.nextRule(individualRuleForB);
+        individualRuleForA.nextRule(new IndividualPricingRule("B", 30L));
 
         return asList(new Object[][]{
                 {multiAIndividualA, singletonList(null), 0L},
-//                {multiAIndividualA, singletonList(""), 0L},
+                {multiAIndividualA, singletonList(""), 0L},
+                {multiAIndividualA, singletonList("C"), 0L},
                 {multiAIndividualA, singletonList("A"), 50L},
                 {multiAIndividualA, asList("A", "A"), 100L},
                 {multiAIndividualA, asList("A", "A", "A"), 130L},
                 {multiAIndividualA, asList("A", "A", "A", "A"), 180L},
-                {individualAindividualB, asList("A", "B"), 80L},
+                {individualAindividualB, singletonList(null), 0L},
+                {individualAindividualB, singletonList(""), 0L},
+                {individualAindividualB, singletonList("C"), 0L},
                 {individualAindividualB, singletonList("A"), 50L},
                 {individualAindividualB, singletonList("B"), 30L},
+                {individualAindividualB, asList("A", "B"), 80L},
+                {multiAmultiBIndividualAindividualB, singletonList(null), 0L},
+                {multiAmultiBIndividualAindividualB, singletonList(""), 0L},
+                {multiAmultiBIndividualAindividualB, singletonList("C"), 0L},
                 {multiAmultiBIndividualAindividualB, asList("A", "B", "A", "B", "A"), 175L},
-                {multiAmultiBIndividualAindividualB, asList("A", "B", "A", "B", "A", "A", "B"), 255L}
+                {multiAmultiBIndividualAindividualB, asList("A", "B", "A", "B", "A", "A", "B"), 255L},
+                {multiAmultiB, singletonList(null), 0L},
+                {multiAmultiB, singletonList(""), 0L},
+                {multiAmultiB, singletonList("C"), 0L},
+                {multiAmultiB, asList("A", "B"), 0L},
+                {multiAmultiB, asList("A", "B", "A", "B", "A"), 175L}
         });
     }
 
