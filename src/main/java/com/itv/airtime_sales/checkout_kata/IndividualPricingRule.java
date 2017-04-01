@@ -4,7 +4,7 @@ public final class IndividualPricingRule implements PricingRuleChain {
 
     private final String item;
     private final long price;
-    private PricingRuleChain pricingRule;
+    private PricingRuleChain nextPricingRule;
 
     public IndividualPricingRule(final String item, final long price) {
         this.item = item;
@@ -13,7 +13,7 @@ public final class IndividualPricingRule implements PricingRuleChain {
 
     @Override
     public void nextRule(PricingRuleChain nextRule) {
-        this.pricingRule = nextRule;
+        this.nextPricingRule = nextRule;
     }
 
     @Override
@@ -23,7 +23,7 @@ public final class IndividualPricingRule implements PricingRuleChain {
         if (item.equals(this.item))
             return result;
 
-        return pricingRule.apply(item, unit);
+        return nextPricingRule.apply(item, unit);
     }
 
     private Unit applyRuleAndGetUpdatedUnit(Unit unit) {
