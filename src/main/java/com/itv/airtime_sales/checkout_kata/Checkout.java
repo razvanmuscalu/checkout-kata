@@ -19,10 +19,11 @@ public class Checkout {
     }
 
     public Receipt getReceipt(List<String> items) {
-        RewardsFunction rewardsPlan = rewardsProvider.getRewardsFunction();
+        RewardsFunction rewardsFunction = rewardsProvider.getRewardsFunction();
 
         Long price = getPrice(items);
-        return new Receipt(price, rewardsPlan.apply(price));
+
+        return new Receipt(price, rewardsFunction.apply(price));
     }
 
     public Long getPrice(List<String> items) {
