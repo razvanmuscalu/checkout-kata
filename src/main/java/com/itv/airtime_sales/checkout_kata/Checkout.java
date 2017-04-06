@@ -10,9 +10,19 @@ import static java.util.stream.Collectors.summingInt;
 public class Checkout {
 
     private final RuleProvider ruleProvider;
+    private final RewardsProvider rewardsProvider;
 
-    public Checkout(RuleProvider ruleProvider) {
+    public Checkout(RuleProvider ruleProvider,
+                    RewardsProvider rewardsProvider) {
         this.ruleProvider = ruleProvider;
+        this.rewardsProvider = rewardsProvider;
+    }
+
+    public Receipt getReceipt(List<String> items) {
+        RewardsFunction rewardsPlan = rewardsProvider.getRewardsFunction();
+
+        Long price = getPrice(items);
+        return new Receipt(price, rewardsPlan.apply(price));
     }
 
     public Long getPrice(List<String> items) {

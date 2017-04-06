@@ -8,6 +8,7 @@ import org.mockito.Mock;
 
 import java.util.List;
 
+import static com.itv.airtime_sales.checkout_kata.RewardsFunction.multiplication;
 import static com.itv.airtime_sales.checkout_kata.PricingRuleChainBuilder.newChain;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -21,6 +22,9 @@ public class CheckoutTest {
 
     @Mock
     private RuleProvider ruleProvider;
+
+    @Mock
+    private RewardsProvider rewardsProvider;
 
     private Checkout sut;
 
@@ -89,7 +93,7 @@ public class CheckoutTest {
     @Before
     public void setUp() {
         initMocks(this);
-        sut = new Checkout(ruleProvider);
+        sut = new Checkout(ruleProvider, rewardsProvider);
     }
 
     @Test
@@ -97,5 +101,14 @@ public class CheckoutTest {
         when(ruleProvider.getRuleChain()).thenReturn(pricingRuleChain);
 
         assertThat("should return correct price using given rules", sut.getPrice(items), is(price));
+    }
+
+    @Test
+    public void shouldProduceReceiptCorrectly() {
+        when(ruleProvider.getRuleChain()).thenReturn(pricingRuleChain);
+        when(rewardsProvider.getRewardsFunction()).thenReturn(multiplication(2L));
+
+        assertThat("should return correct points", sut.getReceipt(items).getPoints(), is(price * 2));
+        assertThat("should return correct price", sut.getReceipt(items).getPrice(), is(price));
     }
 }
